@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="referrer" content="no-referrer">
+  <title>Wunschliste</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <main id="app"><p class="loading">Wunschliste wird geladen …</p></main>
+
+  <dialog id="claim-dialog">
+    <form method="dialog" id="claim-form" class="stack">
+      <h2>Das kaufe ich 🎁</h2>
+      <p id="claim-item-title" style="margin:0;font-weight:600"></p>
+      <p class="muted small" style="margin:0">Der Wunsch wird danach für alle anderen als vergeben angezeigt,
+        damit nichts doppelt geschenkt wird.</p>
+      <label class="field">Dein Name <span class="hint">(sehen die anderen Schenkenden)</span>
+        <input type="text" name="claimer" required maxlength="60" placeholder="z. B. Oma Inge" autocomplete="name">
+      </label>
+      <div class="dialog-actions">
+        <button type="button" class="btn" data-close>Abbrechen</button>
+        <button type="submit" class="btn primary" id="claim-submit">Verbindlich reservieren</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="assets/config.js"></script>
+  <script type="module" src="assets/liste.js"></script>
+</body>
+</html>

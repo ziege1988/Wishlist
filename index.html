@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Wunschlisten verwalten</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/">🎁 Wunschlisten</a>
+    <div class="userbox" id="userbox"></div>
+  </header>
+
+  <main id="app"><p class="loading">Lädt …</p></main>
+
+  <!-- Person anlegen / bearbeiten -->
+  <dialog id="person-dialog">
+    <form method="dialog" id="person-form" class="stack">
+      <h2 id="person-dialog-title">Neue Person</h2>
+      <label class="field">Name
+        <input type="text" name="name" required maxlength="80" placeholder="z. B. Lena" autocomplete="off">
+      </label>
+      <label class="field">Anlass <span class="hint">(optional)</span>
+        <input type="text" name="occasion" maxlength="120" placeholder="z. B. Weihnachten 2026" autocomplete="off">
+      </label>
+      <div class="dialog-actions">
+        <button type="button" class="btn" data-close>Abbrechen</button>
+        <button type="submit" class="btn primary">Speichern</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Wunsch anlegen / bearbeiten -->
+  <dialog id="item-dialog">
+    <form method="dialog" id="item-form" class="stack">
+      <h2 id="item-dialog-title">Neuer Wunsch</h2>
+      <label class="field">Produkt
+        <input type="text" name="title" required maxlength="200" placeholder="z. B. LEGO Baumhaus" autocomplete="off">
+      </label>
+      <label class="field">Link zum Produkt <span class="hint">(optional)</span>
+        <input type="text" inputmode="url" name="url" maxlength="2000" placeholder="https://…" autocomplete="off">
+      </label>
+      <div class="two-col">
+        <label class="field">Preis in € <span class="hint">(optional)</span>
+          <input type="text" name="price" inputmode="decimal" placeholder="49,99" autocomplete="off">
+        </label>
+        <div class="field" style="display:flex;align-items:flex-end;padding-bottom:10px">
+          <label class="check"><input type="checkbox" name="favorite"> ❤️ Herzenswunsch</label>
+        </div>
+      </div>
+      <div class="field">Produktbild <span class="hint">(optional – auch per Einfügen aus der Zwischenablage)</span>
+        <div class="img-picker">
+          <div class="img-preview" id="img-preview">Kein Bild</div>
+          <div class="stack" style="flex:1">
+            <input type="file" name="image" id="image-input" accept="image/*">
+            <button type="button" class="btn sm danger" id="image-remove" hidden>Bild entfernen</button>
+          </div>
+        </div>
+      </div>
+      <label class="field">Notiz <span class="hint">(optional, z. B. Größe, Farbe)</span>
+        <textarea name="note" maxlength="500" rows="2"></textarea>
+      </label>
+      <div class="dialog-actions">
+        <button type="button" class="btn" data-close>Abbrechen</button>
+        <button type="submit" class="btn primary" id="item-save">Speichern</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="assets/config.js"></script>
+  <script type="module" src="assets/admin.js"></script>
+</body>
+</html>
