@@ -4,7 +4,7 @@ Wunschlisten für mehrere Personen – zum Teilen mit Familie und Freunden.
 
 - **Personen anlegen:** Jede Person bekommt ihre eigene Wunschliste.
 - **Wünsche erfassen:** Produktname, Link zum Shop, Preis, Produktbild, Notiz (z. B. Größe/Farbe), optional als ❤️ Herzenswunsch markiert.
-- **Per Link teilen:** Schenkende (z. B. Eltern) öffnen den Link ohne Konto und klicken auf **„Ich kaufe das“**.
+- **Per Link teilen:** Schenkende (z. B. Eltern) öffnen den Link ohne Konto und klicken auf **„Besorge ich“**.
 - **Keine Doppelgeschenke:** Ein reservierter Wunsch ist für alle anderen sofort ausgegraut. Klicken zwei Personen gleichzeitig, gewinnt nachweislich nur eine; die andere bekommt einen Hinweis.
 - **Überraschungsmodus (pro Liste):** Wenn er an ist, siehst du als Admin nicht, was schon reserviert wurde.
 
@@ -14,7 +14,7 @@ Wunschlisten für mehrere Personen – zum Teilen mit Familie und Freunden.
 |---|---|
 | Login per E-Mail und Passwort | Kein Konto nötig |
 | Personen anlegen, umbenennen, löschen | Fortschritt: „2 von 5 Wünschen vergeben“ |
-| Wünsche mit Bild, Link, Preis, Notiz | „Ich kaufe das“ mit Namen |
+| Wünsche mit Bild, Link, Preis, Notiz | „Besorge ich“ mit Namen, „Gekauft“-Stempel über dem Bild |
 | Bilder werden automatisch verkleinert (max. 1200 px, JPEG); Einfügen per Strg+V geht auch | Eigene Reservierung wieder aufheben („Doch nicht“) |
 | Link kopieren, per WhatsApp oder über das Teilen-Menü des Handys verschicken | Vergebene Wünsche ausblenden |
 | **Neuen Link erzeugen**, falls der alte in falsche Hände geraten ist | Aktualisiert sich automatisch (alle 20 s) |

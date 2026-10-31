@@ -305,7 +305,7 @@ function adminItemCard(item, claim) {
   return `
     <article class="item ${claim ? "claimed" : ""}">
       ${item.favorite ? `<span class="fav-badge">❤️ Herzenswunsch</span>` : ""}
-      <div class="img">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : placeholderSvg()}</div>
+      <div class="img">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : placeholderSvg()}${claim ? `<span class="sold-overlay">Gekauft</span>` : ""}</div>
       <div class="body">
         <h3>${esc(item.title)}</h3>
         ${item.price !== null ? `<div class="price">${formatPrice(item.price)}</div>` : ""}

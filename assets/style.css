@@ -188,7 +188,7 @@ textarea { resize: vertical; min-height: 70px; }
   box-shadow: var(--shadow); overflow: hidden; transition: opacity 0.2s, filter 0.2s;
 }
 .item .img {
-  aspect-ratio: 4 / 3; background: var(--surface-2); display: grid; place-items: center; overflow: hidden;
+  position: relative; aspect-ratio: 4 / 3; background: var(--surface-2); display: grid; place-items: center; overflow: hidden;
 }
 .item .img img { width: 100%; height: 100%; object-fit: contain; background: #fff; }
 .item .img svg { width: 44px; height: 44px; color: var(--border); }
@@ -210,13 +210,22 @@ textarea { resize: vertical; min-height: 70px; }
 .claim-badge.mine { background: var(--ok-soft); color: var(--ok); }
 
 /* Vergeben = ausgegraut */
-.item.claimed .img, .item.claimed h3, .item.claimed .price, .item.claimed .note, .item.claimed .shop {
+.item.claimed .img > img, .item.claimed .img > svg, .item.claimed h3, .item.claimed .price, .item.claimed .note, .item.claimed .shop {
   opacity: 0.45; filter: grayscale(1);
 }
+/* "Gekauft"-Stempel über dem Bild */
+.sold-overlay {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-8deg);
+  padding: 6px 18px; border: 3px solid var(--danger); border-radius: 10px;
+  color: var(--danger); background: color-mix(in srgb, var(--surface) 85%, transparent);
+  font-size: clamp(1.1rem, 5vw, 1.5rem); font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+  box-shadow: var(--shadow); pointer-events: none;
+}
+.sold-overlay.mine { border-color: var(--ok); color: var(--ok); }
 .item.claimed h3 { text-decoration: line-through; }
 .item.claimed .fav-badge { opacity: 0.5; }
 .item.mine { border-color: var(--ok); }
-.item.mine .img, .item.mine h3, .item.mine .price, .item.mine .note, .item.mine .shop { opacity: 1; filter: none; text-decoration: none; }
+.item.mine .img > img, .item.mine .img > svg, .item.mine h3, .item.mine .price, .item.mine .note, .item.mine .shop { opacity: 1; filter: none; text-decoration: none; }
 
 /* ---------- Teilen-Ansicht ---------- */
 

@@ -98,7 +98,7 @@ function render() {
       ? `<div class="card empty">Hier stehen noch keine Wünsche. Schau später nochmal vorbei!</div>`
       : `
         <div class="toolbar">
-          <p class="muted small" style="margin:0">Tippe auf <strong>„Ich kaufe das“</strong>, damit nichts doppelt geschenkt wird.</p>
+          <p class="muted small" style="margin:0">Tippe auf <strong>„Besorge ich“</strong>, damit nichts doppelt geschenkt wird.</p>
           ${taken.length ? `
             <label class="check small">
               <input type="checkbox" id="hide-claimed" ${hideClaimed ? "checked" : ""}> Vergebene ausblenden
@@ -125,18 +125,18 @@ function itemCard(item, mine) {
   let claimArea;
   if (isMine) {
     claimArea = `
-      <span class="claim-badge mine">✓ Du kaufst das</span>
+      <span class="claim-badge mine">✓ Du besorgst das</span>
       <div class="actions"><button class="btn sm" data-action="unclaim" data-id="${item.id}">Doch nicht</button></div>`;
   } else if (item.claimed) {
-    claimArea = `<span class="claim-badge">🎁 Wird schon von ${esc(item.claimer_name)} gekauft</span>`;
+    claimArea = `<span class="claim-badge">🎁 Besorgt ${esc(item.claimer_name)}</span>`;
   } else {
-    claimArea = `<div class="actions"><button class="btn primary block" data-action="claim" data-id="${item.id}">Ich kaufe das</button></div>`;
+    claimArea = `<div class="actions"><button class="btn primary block" data-action="claim" data-id="${item.id}">Besorge ich</button></div>`;
   }
 
   return `
     <article class="item ${item.claimed ? "claimed" : ""} ${isMine ? "mine" : ""}">
       ${item.favorite ? `<span class="fav-badge">❤️ Herzenswunsch</span>` : ""}
-      <div class="img">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : placeholderSvg()}</div>
+      <div class="img">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : placeholderSvg()}${item.claimed ? `<span class="sold-overlay ${isMine ? "mine" : ""}">${isMine ? "Besorgst du" : "Gekauft"}</span>` : ""}</div>
       <div class="body">
         <h3>${esc(item.title)}</h3>
         ${item.price !== null ? `<div class="price">${formatPrice(item.price)}</div>` : ""}
@@ -218,7 +218,7 @@ async function submitClaim(e) {
 
   if (error) {
     if (/already_claimed/.test(error.message)) {
-      toast("Zu spät – das hat gerade schon jemand anderes reserviert.", "error");
+      toast("Zu spät – das besorgt gerade schon jemand anderes.", "error");
     } else if (/not_found/.test(error.message)) {
       toast("Diesen Wunsch gibt es nicht mehr.", "error");
     } else {
@@ -230,7 +230,7 @@ async function submitClaim(e) {
   const mine = myClaims();
   mine[claimingItem.id] = secret;
   writeStore(STORE_CLAIMS, mine);
-  toast(`Danke, ${name}! „${claimingItem.title}“ ist für dich reserviert.`, "success");
+  toast(`Danke, ${name}! Du besorgst „${claimingItem.title}“.`, "success");
   load({ quiet: true });
 }
 
