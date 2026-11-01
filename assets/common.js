@@ -317,7 +317,7 @@ const CELEBRATE_LINES = {
 };
 
 /** Feier-Karte + Konfettikanone nach erfolgreichem "Besorge ich" */
-export function celebrate({ recipient, claimer, title, occasion = "other" }) {
+export function celebrate({ recipient, title, occasion = "other" }) {
   document.querySelector(".celebrate")?.remove();
   const lines = CELEBRATE_LINES[occasion] || CELEBRATE_LINES.other;
   const extra = lines[(Math.random() * lines.length) | 0];
@@ -332,7 +332,7 @@ export function celebrate({ recipient, claimer, title, occasion = "other" }) {
   overlay.innerHTML = `
     <div class="celebrate-card">
       <div class="celebrate-emoji" aria-hidden="true">${emoji}</div>
-      <p class="celebrate-hi">Danke, ${esc(claimer)}!</p>
+      <p class="celebrate-hi">Herzlichen Dank! 💛</p>
       <h2 id="celebrate-title">Du wirst große Freude bereiten!</h2>
       <p class="celebrate-text">${esc(recipient)} wird sich riesig über <strong>„${esc(title)}“</strong> freuen.</p>
       <p class="celebrate-extra">${esc(extra)}</p>

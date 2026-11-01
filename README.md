@@ -4,7 +4,7 @@ Wunschlisten für mehrere Personen – zum Teilen mit Familie und Freunden.
 
 - **Personen anlegen:** Jede Person bekommt ihre eigene Wunschliste.
 - **Wünsche erfassen:** Produktname, Link zum Shop, Preis, Produktbild, Notiz (z. B. Größe/Farbe), optional als ❤️ Herzenswunsch markiert.
-- **Per Link teilen:** Schenkende (z. B. Eltern) öffnen den Link ohne Konto und klicken auf **„Besorge ich“**.
+- **Per Link teilen:** Schenkende öffnen den Link ohne Konto und klicken auf **„Besorge ich“**.
 - **Keine Doppelgeschenke:** Ein reservierter Wunsch ist für alle anderen sofort ausgegraut. Klicken zwei Personen gleichzeitig, gewinnt nachweislich nur eine; die andere bekommt einen Hinweis.
 - **Überraschungsmodus (pro Liste):** Wenn er an ist, siehst du als Admin nicht, was schon reserviert wurde.
 - **Anlass pro Liste:** 🎂 Geburtstag, 🎄 Weihnachten oder 🎁 Sonstiges, jeweils mit eigenem Design und Countdown. Beim Geburtstag zeigt die App mit Geburtsjahr auch das Alter an („Lena wird 7“).

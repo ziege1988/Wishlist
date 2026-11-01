@@ -257,7 +257,7 @@ async function submitClaim(e) {
   const mine = myClaims();
   mine[claimingItem.id] = secret;
   writeStore(STORE_CLAIMS, mine);
-  celebrate({ recipient: list.name, claimer: name, title: claimingItem.title, occasion: occasionOf(list) });
+  celebrate({ recipient: list.name, title: claimingItem.title, occasion: occasionOf(list) });
   load({ quiet: true });
 }
 

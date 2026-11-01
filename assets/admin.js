@@ -309,7 +309,7 @@ function renderPerson() {
       <div class="panel-grid">
         <section class="card stack">
           <h3>🔗 Liste teilen</h3>
-          <p class="muted small" style="margin-top:4px">Schick diesen Link an Eltern, Familie und Freunde.
+          <p class="muted small" style="margin-top:4px">Schick diesen Link an alle, die etwas schenken möchten.
             Sie brauchen kein Konto und können Wünsche direkt reservieren.</p>
           <div class="share-link">
             <input type="text" readonly value="${esc(link)}" aria-label="Teilen-Link" data-select-on-focus>
