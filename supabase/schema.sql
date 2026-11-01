@@ -1,8 +1,9 @@
 -- =====================================================================
 --  Wishlist – Datenbankschema für Supabase
---  Einmalig im Supabase-Dashboard unter "SQL Editor" ausführen.
---  Das Skript ist idempotent für Funktionen/Policies, Tabellen werden
---  nur angelegt, wenn sie noch nicht existieren.
+--  Im Supabase-Dashboard unter "SQL Editor" ausführen.
+--  Das Skript darf beliebig oft ausgeführt werden (auch nach Updates):
+--  Tabellen/Spalten werden nur angelegt, wenn sie fehlen, vorhandene
+--  Daten bleiben erhalten.
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
@@ -24,6 +25,12 @@ create table if not exists public.persons (
 
 create index if not exists persons_owner_idx on public.persons (owner_id);
 
+-- Ergänzungen (Version 2) – werden beim erneuten Ausführen nachgerüstet
+alter table public.persons
+  add column if not exists theme text not null default 'birthday'
+    check (theme in ('birthday', 'christmas', 'other')),
+  add column if not exists event_date date;
+
 -- Ein Wunsch auf einer Liste
 create table if not exists public.items (
   id          uuid primary key default gen_random_uuid(),
@@ -38,6 +45,13 @@ create table if not exists public.items (
 );
 
 create index if not exists items_person_idx on public.items (person_id);
+
+alter table public.items
+  -- Preis automatisch aus dem Shop-Link aktuell halten
+  add column if not exists auto_price boolean not null default true,
+  -- letzter erfolgreich ermittelter Preis / letzter Versuch
+  add column if not exists price_updated_at timestamptz,
+  add column if not exists price_checked_at timestamptz;
 
 -- Reservierung ("Ich kaufe das"). Primärschlüssel = item_id
 -- => pro Wunsch kann es technisch nur EINE Reservierung geben.
@@ -108,14 +122,17 @@ security definer
 set search_path = public
 as $$
   select json_build_object(
-    'name',     p.name,
-    'occasion', p.occasion,
+    'name',       p.name,
+    'occasion',   p.occasion,
+    'theme',      p.theme,
+    'event_date', p.event_date,
     'items', coalesce((
       select json_agg(json_build_object(
                'id',           i.id,
                'title',        i.title,
                'url',          i.url,
                'price',        i.price,
+               'price_updated_at', i.price_updated_at,
                'image_path',   i.image_path,
                'note',         i.note,
                'favorite',     i.favorite,

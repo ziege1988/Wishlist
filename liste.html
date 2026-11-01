@@ -2,11 +2,16 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex">
   <meta name="referrer" content="no-referrer">
   <title>Wunschliste</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#fbf8f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#161311" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-title" content="Wunschliste">
+  <link rel="preload" href="assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -16,7 +21,7 @@
     <form method="dialog" id="claim-form" class="stack">
       <h2>Besorge ich 🎁</h2>
       <p id="claim-item-title" style="margin:0;font-weight:600"></p>
-      <p class="muted small" style="margin:0">Der Wunsch wird danach für alle anderen als vergeben angezeigt,
+      <p class="muted small" style="margin:0">Der Wunsch wird danach für alle anderen als gekauft angezeigt,
         damit nichts doppelt geschenkt wird.</p>
       <label class="field">Dein Name <span class="hint">(sehen die anderen Schenkenden)</span>
         <input type="text" name="claimer" required maxlength="60" placeholder="z. B. Oma Inge" autocomplete="name">

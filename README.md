@@ -7,6 +7,9 @@ Wunschlisten für mehrere Personen – zum Teilen mit Familie und Freunden.
 - **Per Link teilen:** Schenkende (z. B. Eltern) öffnen den Link ohne Konto und klicken auf **„Besorge ich“**.
 - **Keine Doppelgeschenke:** Ein reservierter Wunsch ist für alle anderen sofort ausgegraut. Klicken zwei Personen gleichzeitig, gewinnt nachweislich nur eine; die andere bekommt einen Hinweis.
 - **Überraschungsmodus (pro Liste):** Wenn er an ist, siehst du als Admin nicht, was schon reserviert wurde.
+- **Anlass pro Liste:** 🎂 Geburtstag, 🎄 Weihnachten oder 🎁 Sonstiges, jeweils mit eigenem Design und Countdown. Beim Geburtstag zeigt die App mit Geburtsjahr auch das Alter an („Lena wird 7“).
+- **Preise aus dem Link:** Titel, Preis und Bild werden aus dem Shop-Link geladen, und Preise halten sich automatisch aktuell (optional, siehe unten).
+- **Als App auf dem Homescreen:** mit eigenem Icon, auf iPhone und Android.
 
 ## Funktionen im Überblick
 
@@ -18,7 +21,8 @@ Wunschlisten für mehrere Personen – zum Teilen mit Familie und Freunden.
 | Bilder werden automatisch verkleinert (max. 1200 px, JPEG); Einfügen per Strg+V geht auch | Eigene Reservierung wieder aufheben („Doch nicht“) |
 | Link kopieren, per WhatsApp oder über das Teilen-Menü des Handys verschicken | Vergebene Wünsche ausblenden |
 | **Neuen Link erzeugen**, falls der alte in falsche Hände geraten ist | Aktualisiert sich automatisch (alle 20 s) |
-| Überraschungsmodus an/aus, Reservierungen freigeben | |
+| Überraschungsmodus an/aus, Reservierungen freigeben | Preis mit Stand („Preis von heute“) |
+| Anlass, Datum, Countdown; „Preise aktualisieren“ auf Knopfdruck | Design passend zum Anlass, Countdown |
 
 ## Technik
 
@@ -38,6 +42,9 @@ assets/admin.js       Logik Admin
 assets/liste.js       Logik Schenkende
 assets/style.css      Design (inkl. Dark Mode)
 supabase/schema.sql   Datenbankschema, Regeln, Funktionen, Bildspeicher
+supabase/functions/product-info/index.ts   Edge Function: Preis/Titel/Bild aus Shop-Links
+manifest.webmanifest, assets/icons/        App-Icon für den Homescreen
+assets/fonts/         Schrift „Fraunces“ (SIL Open Font License), lokal eingebunden
 vendor/supabase.js    Supabase-Client-Bibliothek
 ```
 
@@ -75,6 +82,39 @@ window.WISHLIST_CONFIG = {
 Unter **Authentication → URL Configuration** die GitHub-Pages-Adresse als **Site URL** eintragen.
 Dann funktioniert „Passwort vergessen?“ auf der Login-Seite.
 
+### 6. Preise automatisch aus dem Link (optional, ca. 5 Minuten)
+Ohne diesen Schritt funktioniert alles andere, Preis, Titel und Bild trägst du dann von Hand ein.
+
+1. Supabase → links **Edge Functions** → **„Deploy a new function“** → **„Via Editor“**.
+2. Als Namen genau **`product-info`** eintragen.
+3. Den vorhandenen Beispielcode komplett löschen. Stattdessen den Inhalt von
+   [`supabase/functions/product-info/index.ts`](supabase/functions/product-info/index.ts) einfügen
+   (auf GitHub: Datei öffnen → Kopieren-Symbol „Copy raw file“).
+4. Auf **„Deploy function“** klicken und ca. 30 Sekunden warten.
+5. In der Funktion auf **„Details“** bzw. **„Settings“** gehen, **„Verify JWT with legacy secret“ / „Enforce JWT Verification“ AUSSCHALTEN** und speichern.
+   Das ist nötig, weil auch Schenkende ohne Konto die Preisaktualisierung anstoßen. Wer was darf, prüft die Funktion selbst:
+   - Shopseiten auslesen und Preise sofort aktualisieren darf nur der angemeldete Admin.
+   - Schenkende können höchstens alle 12 Stunden eine Preisprüfung auslösen.
+
+**So funktioniert es danach:**
+- **Neuer Wunsch:** Link einfügen, dann werden Titel, Preis und Bild automatisch geladen. Alternativ auf „✨ Laden“ tippen.
+- **Automatische Aktualisierung:** Wird die Liste aufgerufen, prüft die App Preise, deren letzte Prüfung über 12 Stunden zurückliegt. Das gilt für dich und für die Schenkenden.
+- **„🔄 Preise aktualisieren“** prüft alle Preise einer Liste sofort.
+- Pro Wunsch lässt sich die automatische Aktualisierung abschalten, z. B. wenn ein Shop einen falschen Preis liefert.
+
+**Grenzen:** Viele Shops stellen ihre Preise in einem Standardformat für Suchmaschinen bereit, z. B. Otto, MediaMarkt, Thalia, IKEA oder die meisten Shopify-Shops. Dort klappt es in der Regel.
+**Amazon** und einige große Händler blockieren automatische Abrufe dagegen häufig. Dann erscheint ein Hinweis, und du trägst den Preis von Hand ein.
+
+### Updates einspielen
+Wenn es eine neue Version gibt, die die Datenbank erweitert, führe **`supabase/schema.sql` einfach erneut** im SQL Editor aus.
+Das Skript ergänzt nur, was fehlt. Vorhandene Listen, Wünsche und Reservierungen bleiben erhalten.
+
+## Als App auf dem Homescreen
+- **iPhone (Safari):** Teilen-Symbol → **„Zum Home-Bildschirm“**.
+- **Android (Chrome):** Menü ⋮ → **„Zum Startbildschirm hinzufügen“** bzw. **„App installieren“**.
+
+Der Admin-Bereich öffnet sich danach wie eine eigene App. Schenkende können ihre Liste genauso ablegen und haben sie dann direkt auf dem Handy.
+
 ## Lokal testen
 
 Ein beliebiger statischer Webserver genügt, zum Beispiel:
@@ -102,4 +142,4 @@ Danach `http://localhost:8000` öffnen. Direktes Öffnen per Doppelklick (`file:
 - **Gruppengeschenke:** Mehrere Personen beteiligen sich mit Beträgen an einem teuren Wunsch.
 - **„Gekauft“ statt nur „reserviert“**, plus Erinnerung an offene Reservierungen.
 - **Echtzeit-Aktualisierung** über Supabase Realtime statt Abfrage alle 20 Sekunden.
-- **Automatisches Auslesen von Titel, Bild und Preis aus dem Shop-Link.** Dafür wäre eine Supabase Edge Function nötig, weil viele Shops das direkte Auslesen im Browser blockieren.
+- **Preis-Wecker:** Hinweis an Schenkende, wenn ein Wunsch deutlich günstiger geworden ist.

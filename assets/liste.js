@@ -1,7 +1,8 @@
 // Teilen-Ansicht für Schenkende (ohne Anmeldung)
 import {
-  sb, isConfigured, esc, formatPrice, safeUrl, hostOf, imageUrl,
-  toast, placeholderSvg, renderNotConfigured,
+  sb, isConfigured, esc, formatPrice, priceStamp, safeUrl, hostOf, imageUrl,
+  toast, placeholder, renderNotConfigured, callPriceFunction,
+  OCCASIONS, occasionOf, countdownText, ageText, eventDateText,
 } from "./common.js";
 
 const app = document.getElementById("app");
@@ -16,6 +17,7 @@ let list = null;
 let hideClaimed = readStore(STORE_HIDE, false);
 let claimingItem = null;
 let refreshTimer = null;
+let pricesChecked = false;
 
 // localStorage kann (z. B. im privaten Modus) fehlen – dann eben ohne Merken
 function readStore(key, fallback) {
@@ -37,7 +39,7 @@ function renderMissing() {
   document.title = "Wunschliste nicht gefunden";
   app.innerHTML = `
     <section class="card narrow" style="text-align:center">
-      <p style="font-size:2.4rem;margin:0">🤔</p>
+      <p style="font-size:2.6rem;margin:0">🤔</p>
       <h1>Liste nicht gefunden</h1>
       <p class="muted">Der Link ist unvollständig oder nicht mehr gültig.
         Bitte frag nach dem aktuellen Link.</p>
@@ -54,6 +56,17 @@ async function load({ quiet = false } = {}) {
   list = data;
   cleanupMyClaims();
   render();
+  if (!pricesChecked) checkPrices();
+}
+
+/** Einmal pro Aufruf: veraltete Preise im Hintergrund aktualisieren lassen */
+async function checkPrices() {
+  pricesChecked = true;
+  if (!list.items.some((i) => i.url && !i.claimed)) return;
+  try {
+    const r = await callPriceFunction({ token });
+    if (r?.changed > 0) load({ quiet: true });
+  } catch { /* Funktion nicht eingerichtet oder Shop nicht erreichbar */ }
 }
 
 /** Lokal gemerkte Reservierungen entfernen, die es nicht mehr gibt */
@@ -74,30 +87,42 @@ function cleanupMyClaims() {
 function render() {
   const mine = myClaims();
   const items = list.items;
+  const occ = occasionOf(list);
   const open = items.filter((i) => !i.claimed);
   const taken = items.filter((i) => i.claimed);
   const mineCount = taken.filter((i) => mine[i.id]).length;
   const pct = items.length ? Math.round((taken.length / items.length) * 100) : 0;
+  const countdown = countdownText(list);
+  const age = ageText(list);
+  const dateText = eventDateText(list);
 
   document.title = `Wunschliste für ${list.name}`;
+  document.body.dataset.occasion = occ;
 
   app.innerHTML = `
-    <header class="hero">
-      ${list.occasion ? `<div class="occasion">${esc(list.occasion)}</div>` : ""}
+    <section class="hero center">
+      <div class="hero-emoji">${OCCASIONS[occ].emoji}</div>
+      <div class="kicker">${esc(list.occasion || OCCASIONS[occ].label)}</div>
       <h1>Wunschliste für ${esc(list.name)}</h1>
+      ${countdown || age || dateText ? `
+        <div class="chips">
+          ${countdown ? `<span class="chip">⏳ ${esc(countdown)}</span>` : ""}
+          ${dateText ? `<span class="chip">📅 ${esc(dateText)}</span>` : ""}
+          ${age ? `<span class="chip">🎈 ${esc(age)}</span>` : ""}
+        </div>` : ""}
       ${items.length
         ? `<div class="progress" aria-hidden="true"><div style="width:${pct}%"></div></div>
-           <p class="muted small" style="margin:0">
+           <p class="progress-text">
              ${taken.length} von ${items.length} ${items.length === 1 ? "Wunsch ist" : "Wünschen sind"} schon vergeben
              ${mineCount ? ` · davon ${mineCount} von dir` : ""}
            </p>`
         : ""}
-    </header>
+    </section>
 
     ${items.length === 0
-      ? `<div class="card empty">Hier stehen noch keine Wünsche. Schau später nochmal vorbei!</div>`
+      ? `<div class="card empty"><p class="big">${OCCASIONS[occ].emoji}</p>Hier stehen noch keine Wünsche. Schau später nochmal vorbei!</div>`
       : `
-        <div class="toolbar">
+        <div class="toolbar share">
           <p class="muted small" style="margin:0">Tippe auf <strong>„Besorge ich“</strong>, damit nichts doppelt geschenkt wird.</p>
           ${taken.length ? `
             <label class="check small">
@@ -106,13 +131,13 @@ function render() {
         </div>
         ${open.length
           ? `<div class="item-grid">${open.map((i) => itemCard(i, mine)).join("")}</div>`
-          : `<div class="card empty">🎉 Alle Wünsche sind schon vergeben!</div>`}
+          : `<div class="card empty"><p class="big">🎉</p>Alle Wünsche sind schon vergeben!</div>`}
         ${taken.length && !hideClaimed
           ? `<h2 class="section-title">Schon vergeben</h2>
              <div class="item-grid">${taken.map((i) => itemCard(i, mine)).join("")}</div>`
           : ""}`}
 
-    <p class="muted small" style="text-align:center;margin-top:40px">
+    <p class="muted small footer-note">
       Die Liste aktualisiert sich automatisch. Eine Reservierung kannst du nur auf diesem Gerät wieder aufheben.
     </p>`;
 }
@@ -136,10 +161,11 @@ function itemCard(item, mine) {
   return `
     <article class="item ${item.claimed ? "claimed" : ""} ${isMine ? "mine" : ""}">
       ${item.favorite ? `<span class="fav-badge">❤️ Herzenswunsch</span>` : ""}
-      <div class="img">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : placeholderSvg()}${item.claimed ? `<span class="sold-overlay ${isMine ? "mine" : ""}">${isMine ? "Besorgst du" : "Gekauft"}</span>` : ""}</div>
+      <div class="img">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : placeholder(list)}${item.claimed ? `<span class="sold-overlay ${isMine ? "mine" : ""}">${isMine ? "Besorgst du" : "Gekauft"}</span>` : ""}</div>
       <div class="body">
         <h3>${esc(item.title)}</h3>
-        ${item.price !== null ? `<div class="price">${formatPrice(item.price)}</div>` : ""}
+        ${item.price !== null ? `<div class="price-row"><span class="price">${formatPrice(item.price)}</span>
+          ${item.price_updated_at ? `<span class="stamp">${esc(priceStamp(item.price_updated_at))}</span>` : ""}</div>` : ""}
         ${url ? `<a class="shop" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Zum Produkt bei ${esc(hostOf(url))} ↗</a>` : ""}
         ${item.note ? `<div class="note">${esc(item.note)}</div>` : ""}
         ${claimArea}
