@@ -2,7 +2,7 @@
 import {
   sb, isConfigured, esc, formatPrice, parsePrice, priceStamp, safeUrl, hostOf, imageUrl,
   toast, placeholder, renderNotConfigured, compressImage, dataUrlToBlob, callPriceFunction,
-  OCCASIONS, occasionOf, countdownText, ageText, eventDateText, BUCKET,
+  OCCASIONS, occasionOf, countdownText, ageText, eventDateText, decoHtml, BUCKET,
 } from "./common.js";
 
 const app = document.getElementById("app");
@@ -98,7 +98,7 @@ function renderLogin() {
         <label class="field">Passwort
           <input type="password" name="password" required autocomplete="current-password">
         </label>
-        <button class="btn primary block" type="submit">Anmelden</button>
+        <button class="btn primary block big" type="submit"><span class="emo">🔑</span> Anmelden</button>
         <button class="btn ghost sm block" type="button" data-action="forgot">Passwort vergessen?</button>
       </form>
     </section>`;
@@ -176,15 +176,18 @@ async function showOverview() {
         <h1>Deine Wunschlisten</h1>
         <p class="muted">Jede Person hat ihre eigene Liste, die du per Link teilen kannst.</p>
       </div>
-      <button class="btn primary" data-action="new-person">+ Neue Wunschliste</button>
+      <button class="btn primary big" data-action="new-person"><span class="emo">✨</span> Neue Wunschliste</button>
     </div>
     ${persons.length === 0
       ? `<div class="card empty">
            <p class="big">🎁</p>
            <p>Noch keine Wunschliste angelegt.<br>Leg los mit der ersten!</p>
-           <button class="btn primary" data-action="new-person">+ Neue Wunschliste</button>
+           <button class="btn primary big" data-action="new-person"><span class="emo">✨</span> Neue Wunschliste</button>
          </div>`
-      : `<div class="person-grid">${persons.map((p) => personCard(p, counts[p.id] || 0)).join("")}</div>`}`;
+      : `<div class="person-grid">
+           ${persons.map((p) => personCard(p, counts[p.id] || 0)).join("")}
+           <button class="add-card" data-action="new-person"><span class="plus">+</span>Neue Wunschliste</button>
+         </div>`}`;
 }
 
 function personCard(p, count) {
@@ -284,6 +287,7 @@ function renderPerson() {
     <div data-occasion="${occ}">
       <a class="back" href="#/">← Alle Wunschlisten</a>
       <section class="hero">
+        ${decoHtml(occ)}
         <div class="hero-head">
           <div>
             <div class="hero-emoji">${OCCASIONS[occ].emoji}</div>
@@ -296,8 +300,8 @@ function renderPerson() {
             </div>
           </div>
           <div class="hero-actions">
-            <button class="btn sm light" data-action="edit-person">Bearbeiten</button>
-            <button class="btn sm light" data-action="delete-person">Löschen</button>
+            <button class="btn sm light" data-action="edit-person"><span class="emo">✏️</span> Bearbeiten</button>
+            <button class="btn icon light" data-action="delete-person" title="Liste löschen" aria-label="Liste löschen">🗑️</button>
           </div>
         </div>
       </section>
@@ -309,15 +313,14 @@ function renderPerson() {
             Sie brauchen kein Konto und können Wünsche direkt reservieren.</p>
           <div class="share-link">
             <input type="text" readonly value="${esc(link)}" aria-label="Teilen-Link" data-select-on-focus>
-            <button class="btn primary" data-action="copy-link">Kopieren</button>
+            <button class="btn primary" data-action="copy-link"><span class="emo">📋</span> Kopieren</button>
           </div>
-          <div class="row">
-            <a class="btn sm" href="https://wa.me/?text=${encodeURIComponent(waText)}" target="_blank" rel="noopener">WhatsApp</a>
-            ${navigator.share ? `<button class="btn sm" data-action="native-share">Teilen …</button>` : ""}
-            <a class="btn sm" href="${esc(link)}" target="_blank" rel="noopener">Vorschau</a>
-            <span class="spacer"></span>
-            <button class="btn sm ghost" data-action="regen-link" title="Der alte Link funktioniert danach nicht mehr">Neuer Link</button>
+          <div class="share-buttons">
+            <a class="btn sm" href="https://wa.me/?text=${encodeURIComponent(waText)}" target="_blank" rel="noopener"><span class="emo">💬</span> WhatsApp</a>
+            ${navigator.share ? `<button class="btn sm" data-action="native-share"><span class="emo">📤</span> Teilen</button>` : ""}
+            <a class="btn sm" href="${esc(link)}" target="_blank" rel="noopener"><span class="emo">👀</span> Vorschau</a>
           </div>
+          <button class="btn sm ghost" data-action="regen-link" title="Der alte Link funktioniert danach nicht mehr"><span class="emo">🔁</span> Neuen Link erzeugen</button>
         </section>
 
         <section class="card stack">
@@ -342,14 +345,14 @@ function renderPerson() {
           ${!person.surprise_mode ? `<span class="stat"><strong>${claimedCount}</strong> gekauft</span>` : ""}
         </div>
         <div class="row">
-          ${hasLinks ? `<button class="btn" data-action="refresh-prices">🔄 Preise aktualisieren</button>` : ""}
-          <button class="btn primary" data-action="new-item">+ Wunsch hinzufügen</button>
+          ${hasLinks ? `<button class="btn" data-action="refresh-prices"><span class="emo">🔄</span> Preise aktualisieren</button>` : ""}
+          <button class="btn primary big" data-action="new-item"><span class="emo">➕</span> Wunsch hinzufügen</button>
         </div>
       </div>
 
       ${items.length === 0
         ? `<div class="card empty"><p class="big">${OCCASIONS[occ].emoji}</p><p>Noch keine Wünsche auf dieser Liste.</p>
-             <button class="btn primary" data-action="new-item">+ Ersten Wunsch hinzufügen</button></div>`
+             <button class="btn primary big" data-action="new-item"><span class="emo">➕</span> Ersten Wunsch hinzufügen</button></div>`
         : `<div class="item-grid">${items.map((i) => adminItemCard(i, claims[i.id])).join("")}</div>`}
     </div>`;
 }
@@ -369,9 +372,10 @@ function adminItemCard(item, claim) {
         ${item.note ? `<div class="note">${esc(item.note)}</div>` : ""}
         ${claim ? `<span class="claim-badge">🎁 Besorgt ${esc(claim.claimer_name)}</span>` : ""}
         <div class="actions">
-          <button class="btn sm" data-action="edit-item" data-id="${item.id}">Bearbeiten</button>
-          ${claim ? `<button class="btn sm" data-action="release-claim" data-id="${item.id}">Freigeben</button>` : ""}
-          <button class="btn sm danger" data-action="delete-item" data-id="${item.id}">Löschen</button>
+          <button class="btn sm" data-action="edit-item" data-id="${item.id}"><span class="emo">✏️</span> Bearbeiten</button>
+          ${claim ? `<button class="btn sm" data-action="release-claim" data-id="${item.id}"><span class="emo">🔓</span> Freigeben</button>` : ""}
+          <span class="spacer"></span>
+          <button class="btn icon" data-action="delete-item" data-id="${item.id}" title="Wunsch löschen" aria-label="Wunsch löschen">🗑️</button>
         </div>
       </div>
     </article>`;

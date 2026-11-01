@@ -44,7 +44,7 @@ assets/style.css      Design (inkl. Dark Mode)
 supabase/schema.sql   Datenbankschema, Regeln, Funktionen, Bildspeicher
 supabase/functions/product-info/index.ts   Edge Function: Preis/Titel/Bild aus Shop-Links
 manifest.webmanifest, assets/icons/        App-Icon für den Homescreen
-assets/fonts/         Schrift „Fraunces“ (SIL Open Font License), lokal eingebunden
+assets/fonts/         Schriften „Fredoka“ & „Nunito“ (SIL Open Font License), lokal eingebunden (DSGVO)
 vendor/supabase.js    Supabase-Client-Bibliothek
 ```
 

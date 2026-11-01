@@ -2,7 +2,7 @@
 import {
   sb, isConfigured, esc, formatPrice, priceStamp, safeUrl, hostOf, imageUrl,
   toast, placeholder, renderNotConfigured, callPriceFunction,
-  OCCASIONS, occasionOf, countdownText, ageText, eventDateText,
+  OCCASIONS, occasionOf, countdownText, ageText, eventDateText, decoHtml, confetti,
 } from "./common.js";
 
 const app = document.getElementById("app");
@@ -101,6 +101,7 @@ function render() {
 
   app.innerHTML = `
     <section class="hero center">
+      ${decoHtml(occ)}
       <div class="hero-emoji">${OCCASIONS[occ].emoji}</div>
       <div class="kicker">${esc(list.occasion || OCCASIONS[occ].label)}</div>
       <h1>Wunschliste für ${esc(list.name)}</h1>
@@ -123,7 +124,7 @@ function render() {
       ? `<div class="card empty"><p class="big">${OCCASIONS[occ].emoji}</p>Hier stehen noch keine Wünsche. Schau später nochmal vorbei!</div>`
       : `
         <div class="toolbar share">
-          <p class="muted small" style="margin:0">Tippe auf <strong>„Besorge ich“</strong>, damit nichts doppelt geschenkt wird.</p>
+          <p class="tip"><span class="emo">💡</span><span>Tippe auf <strong>„Besorge ich“</strong>, damit nichts doppelt geschenkt wird.</span></p>
           ${taken.length ? `
             <label class="check small">
               <input type="checkbox" id="hide-claimed" ${hideClaimed ? "checked" : ""}> Vergebene ausblenden
@@ -151,11 +152,11 @@ function itemCard(item, mine) {
   if (isMine) {
     claimArea = `
       <span class="claim-badge mine">✓ Du besorgst das</span>
-      <div class="actions"><button class="btn sm" data-action="unclaim" data-id="${item.id}">Doch nicht</button></div>`;
+      <div class="actions"><button class="btn sm" data-action="unclaim" data-id="${item.id}"><span class="emo">↩️</span> Doch nicht</button></div>`;
   } else if (item.claimed) {
     claimArea = `<span class="claim-badge">🎁 Besorgt ${esc(item.claimer_name)}</span>`;
   } else {
-    claimArea = `<div class="actions"><button class="btn primary block" data-action="claim" data-id="${item.id}">Besorge ich</button></div>`;
+    claimArea = `<div class="actions"><button class="btn primary block big" data-action="claim" data-id="${item.id}"><span class="emo">🎁</span> Besorge ich</button></div>`;
   }
 
   return `
@@ -256,7 +257,8 @@ async function submitClaim(e) {
   const mine = myClaims();
   mine[claimingItem.id] = secret;
   writeStore(STORE_CLAIMS, mine);
-  toast(`Danke, ${name}! Du besorgst „${claimingItem.title}“.`, "success");
+  toast(`🎉 Danke, ${name}! Du besorgst „${claimingItem.title}“.`, "success");
+  confetti();
   load({ quiet: true });
 }
 

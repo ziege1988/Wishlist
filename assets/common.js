@@ -208,6 +208,41 @@ export function placeholder(person) {
   return `<span class="ph" aria-hidden="true">${person ? OCCASIONS[occasionOf(person)].emoji : "🎁"}</span>`;
 }
 
+/** Schwebende Deko-Symbole im Kopfbereich, passend zum Anlass */
+const DECO = {
+  birthday: ["🎈", "🎉", "✨", "🎈", "🧁", "⭐"],
+  christmas: ["❄️", "⭐", "❄️", "🎁", "✨", "❄️"],
+  other: ["✨", "💝", "🎀", "✨", "💫", "🎁"],
+};
+const DECO_POS = [
+  [6, 14, "2rem", -12, 5.5], [88, 10, "2.2rem", 10, 6.5], [12, 70, "1.5rem", 8, 7],
+  [80, 66, "1.7rem", -10, 6], [30, 6, "1.2rem", 15, 8], [64, 82, "1.3rem", -8, 7.5],
+];
+export function decoHtml(occasion) {
+  const set = DECO[occasion] || DECO.other;
+  return `<div class="deco" aria-hidden="true">${DECO_POS.map(([x, y, s, r, d], i) =>
+    `<span style="left:${x}%;top:${y}%;--s:${s};--r:${r}deg;--d:${d}s;--delay:-${i * 0.9}s">${set[i]}</span>`).join("")}</div>`;
+}
+
+/** Kleine Konfetti-Explosion (z. B. nach "Besorge ich") */
+export function confetti() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const colors = ["#ff7a59", "#ffd23f", "#4cc9f0", "#f72585", "#7bd389", "#b388ff"];
+  const box = document.createElement("div");
+  box.className = "confetti";
+  box.setAttribute("aria-hidden", "true");
+  for (let i = 0; i < 70; i++) {
+    const p = document.createElement("i");
+    p.style.cssText = `left:${Math.random() * 100}%;background:${colors[i % colors.length]};` +
+      `--x:${(Math.random() - 0.5) * 220}px;--rot:${360 + Math.random() * 540}deg;` +
+      `--t:${1.3 + Math.random() * 1.2}s;--delay:${Math.random() * 0.25}s;` +
+      `${Math.random() > 0.5 ? "border-radius:50%;width:9px;height:9px;" : ""}`;
+    box.appendChild(p);
+  }
+  document.body.appendChild(box);
+  setTimeout(() => box.remove(), 3000);
+}
+
 export function renderNotConfigured(container) {
   container.innerHTML = `
     <section class="card narrow">

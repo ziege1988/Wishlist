@@ -8,13 +8,14 @@
   <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#fbf8f4" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#161311" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#fff8f1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1a1517" media="(prefers-color-scheme: dark)">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Wunschlisten">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <link rel="preload" href="assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/fredoka.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/nunito.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -28,7 +29,7 @@
   <!-- Person anlegen / bearbeiten -->
   <dialog id="person-dialog">
     <form method="dialog" id="person-form" class="stack">
-      <h2 id="person-dialog-title">Neue Wunschliste</h2>
+      <h2><span class="emo">📝</span><span id="person-dialog-title">Neue Wunschliste</span></h2>
       <label class="field">Für wen ist die Liste?
         <input type="text" name="name" required maxlength="80" placeholder="z. B. Lena" autocomplete="off">
       </label>
@@ -48,7 +49,7 @@
       </label>
       <div class="dialog-actions">
         <button type="button" class="btn" data-close>Abbrechen</button>
-        <button type="submit" class="btn primary">Speichern</button>
+        <button type="submit" class="btn primary"><span class="emo">💾</span> Speichern</button>
       </div>
     </form>
   </dialog>
@@ -56,11 +57,11 @@
   <!-- Wunsch anlegen / bearbeiten -->
   <dialog id="item-dialog">
     <form method="dialog" id="item-form" class="stack">
-      <h2 id="item-dialog-title">Neuer Wunsch</h2>
+      <h2><span class="emo">🎁</span><span id="item-dialog-title">Neuer Wunsch</span></h2>
       <div class="field">Link zum Produkt <span class="hint">(optional – Titel, Preis und Bild werden dann automatisch geladen)</span>
         <div class="input-row">
           <input type="text" inputmode="url" name="url" maxlength="2000" placeholder="https://…" autocomplete="off">
-          <button type="button" class="btn sm" id="fetch-info">✨ Laden</button>
+          <button type="button" class="btn primary" id="fetch-info"><span class="emo">✨</span> Laden</button>
         </div>
         <div class="fetch-status" id="fetch-status"></div>
       </div>
@@ -73,13 +74,14 @@
         </label>
         <label class="check" style="padding-bottom:12px"><input type="checkbox" name="favorite"> ❤️ Herzenswunsch</label>
       </div>
-      <label class="check" id="auto-price-row"><input type="checkbox" name="auto_price" checked> 🔄 Preis automatisch aus dem Link aktuell halten</label>
+      <div class="option-box" id="auto-price-row"><label class="check"><input type="checkbox" name="auto_price" checked> 🔄 Preis automatisch aus dem Link aktuell halten</label></div>
       <div class="field">Produktbild <span class="hint">(optional – auch per Einfügen aus der Zwischenablage)</span>
         <div class="img-picker">
           <div class="img-preview" id="img-preview">Kein Bild</div>
           <div class="stack" style="flex:1">
-            <input type="file" name="image" id="image-input" accept="image/*">
-            <button type="button" class="btn sm danger" id="image-remove" hidden>Bild entfernen</button>
+            <label class="btn sm file-btn"><span class="emo">📷</span> Foto wählen
+              <input type="file" name="image" id="image-input" accept="image/*"></label>
+            <button type="button" class="btn sm danger" id="image-remove" hidden><span class="emo">🗑️</span> Entfernen</button>
           </div>
         </div>
       </div>
@@ -88,7 +90,7 @@
       </label>
       <div class="dialog-actions">
         <button type="button" class="btn" data-close>Abbrechen</button>
-        <button type="submit" class="btn primary" id="item-save">Speichern</button>
+        <button type="submit" class="btn primary" id="item-save"><span class="emo">💾</span> Speichern</button>
       </div>
     </form>
   </dialog>

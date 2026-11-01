@@ -8,10 +8,11 @@
   <title>Wunschliste</title>
   <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-  <meta name="theme-color" content="#fbf8f4" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#161311" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#fff8f1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1a1517" media="(prefers-color-scheme: dark)">
   <meta name="apple-mobile-web-app-title" content="Wunschliste">
-  <link rel="preload" href="assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/fredoka.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/nunito.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -19,7 +20,7 @@
 
   <dialog id="claim-dialog">
     <form method="dialog" id="claim-form" class="stack">
-      <h2>Besorge ich 🎁</h2>
+      <h2><span class="emo">🎁</span>Besorge ich</h2>
       <p id="claim-item-title" style="margin:0;font-weight:600"></p>
       <p class="muted small" style="margin:0">Der Wunsch wird danach für alle anderen als gekauft angezeigt,
         damit nichts doppelt geschenkt wird.</p>
@@ -28,7 +29,7 @@
       </label>
       <div class="dialog-actions">
         <button type="button" class="btn" data-close>Abbrechen</button>
-        <button type="submit" class="btn primary" id="claim-submit">Ja, besorge ich</button>
+        <button type="submit" class="btn primary" id="claim-submit"><span class="emo">🎉</span> Ja, besorge ich</button>
       </div>
     </form>
   </dialog>
