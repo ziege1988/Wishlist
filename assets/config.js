@@ -9,5 +9,5 @@
 // =====================================================================
 window.WISHLIST_CONFIG = {
   supabaseUrl: "https://uxgyzcbanvzuffxaaenc.supabase.co",
-  supabaseAnonKey: "DEIN-ANON-KEY",
+  supabaseAnonKey: "sb_publishable_-kTcOdyIztXfPxwE21ZJdA_2Q76IQIa",
 };
