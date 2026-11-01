@@ -224,23 +224,139 @@ export function decoHtml(occasion) {
     `<span style="left:${x}%;top:${y}%;--s:${s};--r:${r}deg;--d:${d}s;--delay:-${i * 0.9}s">${set[i]}</span>`).join("")}</div>`;
 }
 
-/** Kleine Konfetti-Explosion (z. B. nach "Besorge ich") */
-export function confetti() {
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  const colors = ["#ff7a59", "#ffd23f", "#4cc9f0", "#f72585", "#7bd389", "#b388ff"];
-  const box = document.createElement("div");
-  box.className = "confetti";
-  box.setAttribute("aria-hidden", "true");
-  for (let i = 0; i < 70; i++) {
-    const p = document.createElement("i");
-    p.style.cssText = `left:${Math.random() * 100}%;background:${colors[i % colors.length]};` +
-      `--x:${(Math.random() - 0.5) * 220}px;--rot:${360 + Math.random() * 540}deg;` +
-      `--t:${1.3 + Math.random() * 1.2}s;--delay:${Math.random() * 0.25}s;` +
-      `${Math.random() > 0.5 ? "border-radius:50%;width:9px;height:9px;" : ""}`;
-    box.appendChild(p);
+const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/**
+ * Konfettikanone: schießt aus beiden unteren Ecken Konfetti im Bogen nach oben,
+ * das anschließend flatternd herunterrieselt (Canvas, ~4 Sekunden).
+ */
+export function confettiCannon() {
+  if (reducedMotion()) return;
+  const canvas = document.createElement("canvas");
+  canvas.className = "confetti-canvas";
+  canvas.setAttribute("aria-hidden", "true");
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext("2d");
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const W = window.innerWidth, H = window.innerHeight;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  ctx.scale(dpr, dpr);
+
+  const colors = ["#ff7a59", "#ffd23f", "#4cc9f0", "#f72585", "#7bd389", "#b388ff", "#ffffff"];
+  const parts = [];
+  const narrow = W < 700;
+
+  function shoot(fromLeft, count) {
+    const x0 = fromLeft ? -10 : W + 10;
+    for (let i = 0; i < count; i++) {
+      // Steigung: auf dem Handy steiler, am Computer flacher Richtung Mitte
+      const deg = narrow ? 66 + Math.random() * 18 : 48 + Math.random() * 24;
+      const angle = deg * (Math.PI / 180);
+      // Gewünschte Steighöhe (55–92 % des Bildschirms) -> nötige Startgeschwindigkeit
+      const rise = H * (0.55 + Math.random() * 0.37);
+      const vy = Math.sqrt(2 * 0.38 * rise) * 1.06; // 1.06 gleicht den Luftwiderstand aus
+      const vx = (vy / Math.tan(angle)) * (fromLeft ? 1 : -1);
+      parts.push({
+        x: x0, y: H + 10,
+        vx, vy: -vy,
+        size: 7 + Math.random() * 7,
+        color: colors[(Math.random() * colors.length) | 0],
+        shape: Math.random() < 0.3 ? "circle" : Math.random() < 0.5 ? "strip" : "rect",
+        rot: Math.random() * Math.PI * 2,
+        vr: (Math.random() - 0.5) * 0.4,
+        flip: Math.random() * Math.PI * 2,
+        vflip: 0.08 + Math.random() * 0.12,
+      });
+    }
   }
-  document.body.appendChild(box);
-  setTimeout(() => box.remove(), 3000);
+  shoot(true, 90);
+  shoot(false, 90);
+  setTimeout(() => { shoot(true, 50); shoot(false, 50); }, 280);
+
+  const start = performance.now();
+  function frame(now) {
+    const t = now - start;
+    ctx.clearRect(0, 0, W, H);
+    for (const p of parts) {
+      p.vy += 0.38;            // Schwerkraft
+      p.vx *= 0.985;           // Luftwiderstand
+      p.vy *= p.vy > 0 ? 0.94 : 0.99; // beim Fallen langsamer -> rieseln
+      p.x += p.vx + Math.sin(p.flip) * 0.6;
+      p.y += p.vy;
+      p.rot += p.vr;
+      p.flip += p.vflip;
+      const scaleY = Math.abs(Math.cos(p.flip)); // Flattern
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.scale(1, Math.max(scaleY, 0.15));
+      ctx.globalAlpha = t > 3400 ? Math.max(0, 1 - (t - 3400) / 700) : 1;
+      ctx.fillStyle = p.color;
+      if (p.shape === "circle") {
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size / 2.4, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (p.shape === "strip") {
+        ctx.fillRect(-p.size / 5, -p.size, p.size / 2.5, p.size * 2);
+      } else {
+        ctx.fillRect(-p.size / 2, -p.size / 3, p.size, p.size / 1.5);
+      }
+      ctx.restore();
+    }
+    if (t < 4100) requestAnimationFrame(frame);
+    else canvas.remove();
+  }
+  requestAnimationFrame(frame);
+}
+
+const CELEBRATE_LINES = {
+  birthday: ["Das wird ein Geburtstag zum Strahlen! 🎂", "Da wird beim Auspacken gejubelt! 🎈"],
+  christmas: ["Das wird ein wunderschönes Fest! 🎄", "Da leuchten unterm Baum die Augen! ✨"],
+  other: ["Das wird ein Moment zum Strahlen! ✨", "Da wird beim Auspacken gejubelt! 🎉"],
+};
+
+/** Feier-Karte + Konfettikanone nach erfolgreichem "Besorge ich" */
+export function celebrate({ recipient, claimer, title, occasion = "other" }) {
+  document.querySelector(".celebrate")?.remove();
+  const lines = CELEBRATE_LINES[occasion] || CELEBRATE_LINES.other;
+  const extra = lines[(Math.random() * lines.length) | 0];
+  const emoji = OCCASIONS[occasion]?.emoji || "🎁";
+
+  const overlay = document.createElement("div");
+  overlay.className = "celebrate";
+  overlay.dataset.occasion = occasion;
+  overlay.setAttribute("role", "alertdialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-labelledby", "celebrate-title");
+  overlay.innerHTML = `
+    <div class="celebrate-card">
+      <div class="celebrate-emoji" aria-hidden="true">${emoji}</div>
+      <p class="celebrate-hi">Danke, ${esc(claimer)}!</p>
+      <h2 id="celebrate-title">Du wirst große Freude bereiten!</h2>
+      <p class="celebrate-text">${esc(recipient)} wird sich riesig über <strong>„${esc(title)}“</strong> freuen.</p>
+      <p class="celebrate-extra">${esc(extra)}</p>
+      <button type="button" class="btn primary big block" data-close-celebrate><span class="emo">🥳</span> Juhu!</button>
+      <p class="celebrate-note">Der Wunsch ist jetzt für dich reserviert – niemand sonst kann ihn mehr auswählen.</p>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const prevFocus = document.activeElement;
+  const close = () => {
+    overlay.classList.add("closing");
+    document.removeEventListener("keydown", onKey);
+    setTimeout(() => overlay.remove(), 220);
+    prevFocus?.focus?.();
+  };
+  const onKey = (e) => { if (e.key === "Escape") close(); };
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay || e.target.closest("[data-close-celebrate]")) close();
+  });
+  document.addEventListener("keydown", onKey);
+  overlay.querySelector("[data-close-celebrate]").focus({ preventScroll: true });
+
+  navigator.vibrate?.([30, 40, 60]); // kleines "Plopp" auf Android
+  confettiCannon();
 }
 
 export function renderNotConfigured(container) {

@@ -534,19 +534,54 @@ dialog h2 .emo { display: grid; place-items: center; width: 46px; height: 46px; 
 .loading::before { content: "🎁"; display: block; font-size: 3rem; margin-bottom: 10px; animation: bob .6s ease-in-out infinite alternate; }
 @keyframes bob { from { transform: translateY(0) rotate(-6deg); } to { transform: translateY(-14px) rotate(6deg); } }
 
-/* Konfetti beim Reservieren */
-.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 60; overflow: hidden; }
-.confetti i {
-  position: absolute; top: -20px; width: 10px; height: 14px; border-radius: 3px;
-  animation: fall var(--t, 1.6s) cubic-bezier(.3,.6,.6,1) forwards; animation-delay: var(--delay, 0s);
+/* ---------- Feier nach "Besorge ich": Konfettikanone + Karte ---------- */
+
+.confetti-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 80; }
+.celebrate {
+  position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 20px;
+  background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--accent) 30%, transparent), rgba(40, 20, 15, .55) 70%);
+  backdrop-filter: blur(5px);
+  animation: fadeIn .25s ease-out;
 }
-@keyframes fall {
-  to { transform: translate(var(--x, 0), 110vh) rotate(var(--rot, 540deg)); opacity: .9; }
+.celebrate.closing { animation: fadeOut .22s ease-in forwards; }
+@keyframes fadeIn { from { opacity: 0; } }
+@keyframes fadeOut { to { opacity: 0; } }
+.celebrate-card {
+  position: relative; width: min(420px, 100%); text-align: center;
+  background: var(--surface); color: var(--text);
+  border-radius: 34px; padding: 62px 26px 22px; margin-top: 40px;
+  box-shadow: 0 8px 0 var(--accent-shadow), 0 30px 80px -10px rgba(0,0,0,.5);
+  border: 3px solid var(--accent);
+  animation: celebratePop .6s cubic-bezier(.3,1.7,.5,1) both .1s;
 }
+@keyframes celebratePop {
+  0% { transform: scale(.3) rotate(-12deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+.celebrate-emoji {
+  position: absolute; left: 50%; top: -52px; width: 104px; height: 104px; margin-left: -52px;
+  display: grid; place-items: center; font-size: 3.6rem;
+  background: var(--grad); border-radius: 34px; border: 5px solid var(--surface);
+  box-shadow: 0 6px 0 rgba(0,0,0,.1), 0 16px 30px -8px rgba(0,0,0,.4);
+  animation: hop 1s cubic-bezier(.3,1.6,.5,1) .35s both, wiggle 3s ease-in-out 1.4s infinite;
+}
+@keyframes hop {
+  0% { transform: translateY(40px) scale(.4) rotate(-20deg); opacity: 0; }
+  60% { transform: translateY(-14px) scale(1.12) rotate(8deg); opacity: 1; }
+  100% { transform: translateY(0) scale(1) rotate(-6deg); }
+}
+.celebrate-hi { margin: 0; font: 600 1.05rem var(--font-display); color: var(--accent); }
+.celebrate-card h2 {
+  font-size: clamp(1.6rem, 6.5vw, 2.1rem); line-height: 1.12; margin: 6px 0 12px; display: block;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #f7b500));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.celebrate-text { margin: 0 0 6px; font-size: 1.08rem; }
+.celebrate-extra { margin: 0 0 20px; font: 500 1.05rem var(--font-display); color: var(--muted); }
+.celebrate-note { margin: 14px 0 0; font-size: .82rem; color: var(--muted); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .confetti { display: none; }
 }
 
 /* Admin-Kopfbereich: Deko nicht hinter den Buttons oben rechts */

@@ -2,7 +2,7 @@
 import {
   sb, isConfigured, esc, formatPrice, priceStamp, safeUrl, hostOf, imageUrl,
   toast, placeholder, renderNotConfigured, callPriceFunction,
-  OCCASIONS, occasionOf, countdownText, ageText, eventDateText, decoHtml, confetti,
+  OCCASIONS, occasionOf, countdownText, ageText, eventDateText, decoHtml, celebrate,
 } from "./common.js";
 
 const app = document.getElementById("app");
@@ -257,8 +257,7 @@ async function submitClaim(e) {
   const mine = myClaims();
   mine[claimingItem.id] = secret;
   writeStore(STORE_CLAIMS, mine);
-  toast(`🎉 Danke, ${name}! Du besorgst „${claimingItem.title}“.`, "success");
-  confetti();
+  celebrate({ recipient: list.name, claimer: name, title: claimingItem.title, occasion: occasionOf(list) });
   load({ quiet: true });
 }
 
