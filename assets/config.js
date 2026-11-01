@@ -8,6 +8,6 @@
 //  NIEMALS den "service_role"/"secret" Key hier eintragen!
 // =====================================================================
 window.WISHLIST_CONFIG = {
-  supabaseUrl: "https://DEIN-PROJEKT.supabase.co",
+  supabaseUrl: "https://uxgyzcbanvzuffxaaenc.supabase.co",
   supabaseAnonKey: "DEIN-ANON-KEY",
 };

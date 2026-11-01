@@ -1,6 +1,9 @@
 // Gemeinsame Helfer für Admin- und Teilen-Ansicht
 
-const cfg = window.WISHLIST_CONFIG || {};
+const cfg = { ...(window.WISHLIST_CONFIG || {}) };
+// Toleriert versehentlich mitkopierte Pfade wie ".../rest/v1/" und Leerzeichen
+cfg.supabaseUrl = String(cfg.supabaseUrl || "").trim().replace(/\/(rest|auth|storage)\/v1\/?.*$/, "").replace(/\/+$/, "");
+cfg.supabaseAnonKey = String(cfg.supabaseAnonKey || "").trim();
 
 export const isConfigured = Boolean(
   cfg.supabaseUrl &&
