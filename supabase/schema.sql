@@ -29,7 +29,10 @@ create index if not exists persons_owner_idx on public.persons (owner_id);
 alter table public.persons
   add column if not exists theme text not null default 'birthday'
     check (theme in ('birthday', 'christmas', 'other')),
-  add column if not exists event_date date;
+  add column if not exists event_date date,
+  -- Farbe beim Geburtstag: rosa oder pastellgrün
+  add column if not exists palette text not null default 'pink'
+    check (palette in ('pink', 'green'));
 
 -- Ein Wunsch auf einer Liste
 create table if not exists public.items (
@@ -126,6 +129,7 @@ as $$
     'occasion',   p.occasion,
     'theme',      p.theme,
     'event_date', p.event_date,
+    'palette',    p.palette,
     'items', coalesce((
       select json_agg(json_build_object(
                'id',           i.id,

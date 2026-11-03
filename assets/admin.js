@@ -2,7 +2,7 @@
 import {
   sb, isConfigured, esc, formatPrice, parsePrice, priceStamp, safeUrl, hostOf, imageUrl,
   toast, placeholder, renderNotConfigured, compressImage, dataUrlToBlob, callPriceFunction,
-  OCCASIONS, occasionOf, countdownText, ageText, eventDateText, decoHtml, BUCKET,
+  OCCASIONS, occasionOf, countdownText, ageText, eventDateText, decoHtml, paletteOf, themeAttrs, BUCKET,
 } from "./common.js";
 
 const app = document.getElementById("app");
@@ -194,7 +194,7 @@ function personCard(p, count) {
   const occ = occasionOf(p);
   const countdown = countdownText(p);
   return `
-    <a class="person-card" href="#/p/${p.id}" data-occasion="${occ}">
+    <a class="person-card" href="#/p/${p.id}" ${themeAttrs(p)}>
       <div class="banner"><div class="avatar">${OCCASIONS[occ].emoji}</div></div>
       <div class="content">
         <h3>${esc(p.name)}</h3>
@@ -284,10 +284,10 @@ function renderPerson() {
   const waText = `${OCCASIONS[occ].emoji} Hier ist die Wunschliste für ${person.name}${person.occasion ? ` (${person.occasion})` : ""}: ${link}`;
 
   app.innerHTML = `
-    <div data-occasion="${occ}">
+    <div ${themeAttrs(person)}>
       <a class="back" href="#/">← Alle Wunschlisten</a>
       <section class="hero">
-        ${decoHtml(occ)}
+        ${decoHtml(occ, paletteOf(person))}
         <div class="hero-head">
           <div>
             <div class="hero-emoji">${OCCASIONS[occ].emoji}</div>
@@ -437,6 +437,9 @@ let editingPerson = null;
 
 function updateEventDateField() {
   const theme = personForm.elements.theme.value;
+  document.getElementById("palette-field").hidden = theme !== "birthday";
+  personDialog.dataset.occasion = theme;
+  personDialog.dataset.palette = personForm.elements.palette.value;
   document.getElementById("event-date-field").hidden = theme === "christmas";
   document.getElementById("event-date-label").textContent = theme === "birthday" ? "Geburtstag" : "Datum";
   document.getElementById("event-date-hint").textContent = theme === "birthday"
@@ -452,6 +455,7 @@ function openPersonDialog(person = null) {
   personForm.elements.occasion.value = person?.occasion || "";
   personForm.elements.theme.value = person ? occasionOf(person) : "birthday";
   personForm.elements.event_date.value = person?.event_date || "";
+  personForm.elements.palette.value = person ? paletteOf(person) : "pink";
   updateEventDateField();
   personDialog.showModal();
   personForm.elements.name.focus();
@@ -463,11 +467,12 @@ async function savePerson(e) {
   const occasion = personForm.elements.occasion.value.trim() || null;
   const theme = personForm.elements.theme.value;
   const event_date = theme === "christmas" ? null : personForm.elements.event_date.value || null;
+  const palette = personForm.elements.palette.value === "green" ? "green" : "pink";
   if (!name) return toast("Bitte einen Namen eingeben.", "error");
 
   const btn = personForm.querySelector("[type=submit]");
   btn.disabled = true;
-  const payload = { name, occasion, theme, event_date };
+  const payload = { name, occasion, theme, event_date, palette };
   const res = editingPerson
     ? await sb.from("persons").update(payload).eq("id", editingPerson.id)
     : await sb.from("persons").insert(payload).select("id").single();
@@ -762,7 +767,7 @@ function setupDialogs() {
     dialog.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => dialog.close()));
   }
   personForm.addEventListener("submit", savePerson);
-  personForm.addEventListener("change", (e) => { if (e.target.name === "theme") updateEventDateField(); });
+  personForm.addEventListener("change", (e) => { if (e.target.name === "theme" || e.target.name === "palette") updateEventDateField(); });
   itemForm.addEventListener("submit", saveItem);
   fetchBtn.addEventListener("click", fetchProductInfo);
 

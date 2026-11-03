@@ -2,7 +2,7 @@
 import {
   sb, isConfigured, esc, formatPrice, priceStamp, safeUrl, hostOf, imageUrl,
   toast, placeholder, renderNotConfigured, callPriceFunction,
-  OCCASIONS, occasionOf, countdownText, ageText, eventDateText, decoHtml, celebrate,
+  OCCASIONS, occasionOf, countdownText, ageText, eventDateText, decoHtml, celebrate, paletteOf,
 } from "./common.js";
 
 const app = document.getElementById("app");
@@ -98,10 +98,11 @@ function render() {
 
   document.title = `Wunschliste für ${list.name}`;
   document.body.dataset.occasion = occ;
+  document.body.dataset.palette = paletteOf(list);
 
   app.innerHTML = `
     <section class="hero center">
-      ${decoHtml(occ)}
+      ${decoHtml(occ, paletteOf(list))}
       <div class="hero-emoji">${OCCASIONS[occ].emoji}</div>
       <div class="kicker">${esc(list.occasion || OCCASIONS[occ].label)}</div>
       <h1>Wunschliste für ${esc(list.name)}</h1>
@@ -257,7 +258,7 @@ async function submitClaim(e) {
   const mine = myClaims();
   mine[claimingItem.id] = secret;
   writeStore(STORE_CLAIMS, mine);
-  celebrate({ recipient: list.name, title: claimingItem.title, occasion: occasionOf(list) });
+  celebrate({ recipient: list.name, title: claimingItem.title, occasion: occasionOf(list), palette: paletteOf(list) });
   load({ quiet: true });
 }
 

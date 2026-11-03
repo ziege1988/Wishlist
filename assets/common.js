@@ -105,6 +105,16 @@ export function occasionOf(person) {
   return OCCASIONS[person.theme] ? person.theme : "other";
 }
 
+/** Farbvariante (aktuell nur beim Geburtstag: "pink" oder "green") */
+export function paletteOf(person) {
+  return person.palette === "green" ? "green" : "pink";
+}
+
+/** data-Attribute für Anlass + Farbe, z. B. für Kopfbereich oder Karten */
+export function themeAttrs(person) {
+  return `data-occasion="${occasionOf(person)}" data-palette="${paletteOf(person)}"`;
+}
+
 function parseDate(iso) {
   if (!iso) return null;
   const [y, m, d] = String(iso).slice(0, 10).split("-").map(Number);
@@ -211,6 +221,7 @@ export function placeholder(person) {
 /** Schwebende Deko-Symbole im Kopfbereich, passend zum Anlass */
 const DECO = {
   birthday: ["🎈", "🎉", "✨", "🎈", "🧁", "⭐"],
+  "birthday-green": ["🎈", "🎉", "⭐", "🎈", "🚀", "✨"],
   christmas: ["❄️", "⭐", "❄️", "🎁", "✨", "❄️"],
   other: ["✨", "💝", "🎀", "✨", "💫", "🎁"],
 };
@@ -218,11 +229,33 @@ const DECO_POS = [
   [6, 14, "2rem", -12, 5.5], [88, 10, "2.2rem", 10, 6.5], [12, 70, "1.5rem", 8, 7],
   [80, 66, "1.7rem", -10, 6], [30, 6, "1.2rem", 15, 8], [64, 82, "1.3rem", -8, 7.5],
 ];
-export function decoHtml(occasion) {
-  const set = DECO[occasion] || DECO.other;
-  return `<div class="deco" aria-hidden="true">${DECO_POS.map(([x, y, s, r, d], i) =>
-    `<span style="left:${x}%;top:${y}%;--s:${s};--r:${r}deg;--d:${d}s;--delay:-${i * 0.9}s">${set[i]}</span>`).join("")}</div>`;
+export function decoHtml(occasion, palette = "pink") {
+  const set = DECO[`${occasion}-${palette}`] || DECO[occasion] || DECO.other;
+  const floating = DECO_POS.map(([x, y, s, r, d], i) =>
+    `<span style="left:${x}%;top:${y}%;--s:${s};--r:${r}deg;--d:${d}s;--delay:-${i * 0.9}s">${set[i]}</span>`).join("");
+  return `<div class="deco" aria-hidden="true">${floating}</div>${occasion === "christmas" ? XMAS_SCENE : ""}`;
 }
+
+/** Weihnachtsszene: geschmückter Tannenbaum + kleiner Baum + Schneehügel */
+const TREE = (id, star = true) => `
+  <svg class="${id}" viewBox="0 0 120 160" aria-hidden="true">
+    <rect x="52" y="132" width="16" height="22" rx="3" fill="#8b5a2b"/>
+    <path d="M60 18 L104 76 H84 L112 112 H88 L116 142 H4 L32 112 H8 L36 76 H16 Z" fill="#5fbf7f"/>
+    <path d="M60 18 L104 76 H84 L112 112 H88 L116 142 H60 Z" fill="#43a463"/>
+    <path d="M30 76 Q60 92 92 74 M22 112 Q60 128 100 110" stroke="#fff7d6" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>
+    <circle cx="44" cy="92" r="5.5" fill="#ff5a5a"/><circle cx="76" cy="62" r="5" fill="#ffd23f"/>
+    <circle cx="70" cy="98" r="5.5" fill="#4cc9f0"/><circle cx="38" cy="128" r="6" fill="#ffd23f"/>
+    <circle cx="86" cy="126" r="6" fill="#ff5a5a"/><circle cx="56" cy="118" r="5" fill="#b388ff"/>
+    ${star ? `<path class="xmas-star" d="M60 2 l5 11 12 1.5 -9 8 2.5 12 -10.5 -6 -10.5 6 2.5 -12 -9 -8 12 -1.5z" fill="#ffd23f" stroke="#fff3b0" stroke-width="1.5"/>` : ""}
+  </svg>`;
+const XMAS_SCENE = `
+  <div class="xmas-scene" aria-hidden="true">
+    ${TREE("xmas-tree")}
+    ${TREE("xmas-tree small", false)}
+    <svg class="xmas-snow" viewBox="0 0 400 40" preserveAspectRatio="none">
+      <path d="M0 22 Q50 6 100 18 T200 16 T300 20 T400 12 V40 H0 Z" fill="#ffffff"/>
+    </svg>
+  </div>`;
 
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -317,7 +350,7 @@ const CELEBRATE_LINES = {
 };
 
 /** Feier-Karte + Konfettikanone nach erfolgreichem "Besorge ich" */
-export function celebrate({ recipient, title, occasion = "other" }) {
+export function celebrate({ recipient, title, occasion = "other", palette = "pink" }) {
   document.querySelector(".celebrate")?.remove();
   const lines = CELEBRATE_LINES[occasion] || CELEBRATE_LINES.other;
   const extra = lines[(Math.random() * lines.length) | 0];
@@ -326,6 +359,7 @@ export function celebrate({ recipient, title, occasion = "other" }) {
   const overlay = document.createElement("div");
   overlay.className = "celebrate";
   overlay.dataset.occasion = occasion;
+  overlay.dataset.palette = palette;
   overlay.setAttribute("role", "alertdialog");
   overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-labelledby", "celebrate-title");

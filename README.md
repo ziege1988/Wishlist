@@ -7,7 +7,7 @@ Wunschlisten für mehrere Personen – zum Teilen mit Familie und Freunden.
 - **Per Link teilen:** Schenkende öffnen den Link ohne Konto und klicken auf **„Besorge ich“**.
 - **Keine Doppelgeschenke:** Ein reservierter Wunsch ist für alle anderen sofort ausgegraut. Klicken zwei Personen gleichzeitig, gewinnt nachweislich nur eine; die andere bekommt einen Hinweis.
 - **Überraschungsmodus (pro Liste):** Wenn er an ist, siehst du als Admin nicht, was schon reserviert wurde.
-- **Anlass pro Liste:** 🎂 Geburtstag, 🎄 Weihnachten oder 🎁 Sonstiges, jeweils mit eigenem Design und Countdown. Beim Geburtstag zeigt die App mit Geburtsjahr auch das Alter an („Lena wird 7“).
+- **Anlass pro Liste:** 🎂 Geburtstag (wahlweise 🌸 Rosa oder 🌿 Pastellgrün), 🎄 Weihnachten (Tannengrün mit geschmücktem Baum und Schnee) oder 🎁 Sonstiges, jeweils mit eigenem Design und Countdown. Beim Geburtstag zeigt die App mit Geburtsjahr auch das Alter an („Lena wird 7“).
 - **Preise aus dem Link:** Titel, Preis und Bild werden aus dem Shop-Link geladen, und Preise halten sich automatisch aktuell (optional, siehe unten).
 - **Als App auf dem Homescreen:** mit eigenem Icon, auf iPhone und Android.
 

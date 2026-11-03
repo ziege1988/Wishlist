@@ -98,10 +98,13 @@
   --pattern-size: 57px 63px, 91px 79px, 73px 101px, 127px 113px;
 }
 [data-occasion="christmas"] {
-  --accent: #d93a3a;
-  --accent-hover: #bf2b2b;
-  --accent-soft: #ffe8e4;
-  --accent-shadow: #9e2020;
+  --accent: #2f8f5b;
+  --accent-hover: #237347;
+  --accent-soft: #e3f3e8;
+  --accent-shadow: #1b5e3a;
+  /* Rot als weihnachtlicher Akzent */
+  --price-fg: #c62828;
+  --price-bg: #fde7e4;
   --grad: linear-gradient(150deg, #2e8b57 0%, #1d6b43 55%, #155535 100%);
   --pattern:
     radial-gradient(circle, rgba(255,255,255,.85) 0 2.5px, transparent 3px),
@@ -109,9 +112,28 @@
     radial-gradient(circle, rgba(255,255,255,.35) 0 3.5px, transparent 4px);
   --pattern-size: 53px 61px, 37px 43px, 97px 89px;
 }
+/* Geburtstag in Pastellgrün (seidig, sanft) */
+[data-occasion="birthday"][data-palette="green"] {
+  --accent: #3e9b78;
+  --accent-hover: #2f8264;
+  --accent-soft: #e2f3ea;
+  --accent-shadow: #2b6e55;
+  --grad: linear-gradient(135deg, #e3f5e8 0%, #bfe5cd 45%, #95d0b1 100%);
+  --hero-fg: #1d4a39;
+  --hero-glass: rgba(255,255,255,.55);
+  --pattern:
+    radial-gradient(circle at 30% 40%, rgba(255,255,255,.9) 0 3px, transparent 3.5px),
+    radial-gradient(circle at 60% 20%, rgba(255,210,63,.75) 0 3.5px, transparent 4px),
+    radial-gradient(circle at 80% 70%, rgba(110,190,255,.55) 0 3px, transparent 3.5px),
+    radial-gradient(circle at 15% 85%, rgba(255,255,255,.7) 0 5px, transparent 5.5px);
+  --pattern-size: 57px 63px, 91px 79px, 73px 101px, 127px 113px;
+}
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) [data-occasion="birthday"] { --accent: #ff8cc4; --accent-hover: #ffadd6; --accent-soft: #46203a; --accent-shadow: #a83c74; --on-accent: #2b0b1c; }
-  :root:not([data-theme="light"]) [data-occasion="christmas"] { --accent: #ff7b72; --accent-hover: #ff9d96; --accent-soft: #46211f; --accent-shadow: #a33a33; --on-accent: #2b0b0b; }
+  :root:not([data-theme="light"]) [data-occasion="birthday"][data-palette="green"] { --accent: #7fd6ad; --accent-hover: #a3e4c5; --accent-soft: #1d3a2d; --accent-shadow: #2f7a5a; --on-accent: #0d2a1e; }
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) [data-occasion="birthday"]:not([data-palette="green"]) { --accent: #ff8cc4; --accent-hover: #ffadd6; --accent-soft: #46203a; --accent-shadow: #a83c74; --on-accent: #2b0b1c; }
+  :root:not([data-theme="light"]) [data-occasion="christmas"] { --accent: #6fd39a; --accent-hover: #95e2b6; --accent-soft: #1b3826; --accent-shadow: #2a7a4c; --on-accent: #0b2416; --price-fg: #ff8a80; --price-bg: #45211f; }
 }
 
 /* ---------- Grundlagen ---------- */
@@ -214,10 +236,10 @@ main { max-width: 1120px; margin: 0 auto; padding: 4px 16px 80px; }
 .btn.big { min-height: 58px; font-size: 1.15rem; border-radius: 20px; }
 .btn.icon { min-height: 46px; width: 46px; padding: 0; border-radius: 15px; font-size: 1.2rem; }
 .btn.light {
-  --btn-bg: rgba(255,255,255,.22); --btn-fg: #fff; --btn-border: rgba(255,255,255,.45); --btn-shadow: rgba(0,0,0,.15);
+  --btn-bg: var(--hero-glass, rgba(255,255,255,.22)); --btn-fg: var(--hero-fg, #fff); --btn-border: rgba(255,255,255,.45); --btn-shadow: rgba(0,0,0,.15);
   backdrop-filter: blur(6px);
 }
-.btn.light:hover { --btn-bg: rgba(255,255,255,.34); }
+.btn.light:hover { --btn-bg: rgba(255,255,255,.6); }
 .btn .spin { width: 16px; height: 16px; border: 2.5px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -266,6 +288,11 @@ textarea { resize: vertical; min-height: 80px; }
 }
 .seg label:has(input:checked) .emo { transform: scale(1.15); }
 
+.seg.two { grid-template-columns: repeat(2, 1fr); }
+.swatch { width: 40px; height: 40px; border-radius: 14px; box-shadow: inset 0 0 0 2px rgba(0,0,0,.06); margin-bottom: 2px; }
+.swatch.pink { background: linear-gradient(135deg, #ff9ccf, #c98bff 60%, #8fa2ff); }
+.swatch.green { background: linear-gradient(135deg, #e3f5e8, #bfe5cd 45%, #95d0b1); }
+
 /* Schalter */
 .switch { display: flex; gap: 14px; align-items: flex-start; cursor: pointer; }
 .switch input { position: absolute; opacity: 0; pointer-events: none; }
@@ -287,7 +314,7 @@ textarea { resize: vertical; min-height: 80px; }
 
 .hero {
   position: relative; overflow: hidden; isolation: isolate;
-  background: var(--grad); color: #fff;
+  background: var(--grad); color: var(--hero-fg, #fff);
   border-radius: 34px;
   padding: clamp(28px, 5vw, 46px) clamp(20px, 4vw, 42px);
   box-shadow: var(--shadow-lg);
@@ -298,9 +325,10 @@ textarea { resize: vertical; min-height: 80px; }
   background-image: var(--pattern); background-size: var(--pattern-size);
 }
 .hero.center { text-align: center; }
-.hero h1 { color: #fff; margin: 6px 0 8px; text-shadow: 0 3px 0 rgba(0,0,0,.08), 0 6px 20px rgba(0,0,0,.12); }
+.hero h1 { color: var(--hero-fg, #fff); margin: 6px 0 8px; text-shadow: 0 3px 0 rgba(0,0,0,.08), 0 6px 20px rgba(0,0,0,.12); }
+[data-palette="green"] .hero h1 { text-shadow: 0 2px 0 rgba(255,255,255,.6); }
 .hero .kicker {
-  display: inline-block; padding: 4px 14px; border-radius: 999px; background: rgba(255,255,255,.22);
+  display: inline-block; padding: 4px 14px; border-radius: 999px; background: var(--hero-glass, rgba(255,255,255,.22));
   font-family: var(--font-display); font-size: .85rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
 }
 .hero-emoji {
@@ -343,6 +371,25 @@ textarea { resize: vertical; min-height: 80px; }
 .hero .progress-text { font-family: var(--font-display); font-weight: 500; font-size: 1rem; margin: 0; }
 .hero-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
 .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* Weihnachten: Tannenbaum + Schneehügel im Kopfbereich */
+[data-occasion="christmas"] .hero { padding-bottom: calc(clamp(28px, 5vw, 46px) + 26px); }
+.xmas-scene { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.xmas-tree {
+  position: absolute; right: 5%; bottom: 12px; height: 80%; max-height: 200px; width: auto;
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,.28));
+  transform-origin: 50% 100%; animation: sway 6s ease-in-out infinite;
+}
+.xmas-tree.small { right: calc(5% + min(140px, 18%)); height: 52%; max-height: 125px; opacity: .9; animation-delay: -3s; }
+.xmas-star { transform-origin: 60px 16px; animation: twinkle 2.4s ease-in-out infinite; }
+.xmas-snow { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: 34px; }
+@keyframes sway { 0%, 100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg); } }
+@keyframes twinkle { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.18); opacity: .8; } }
+.hero.center .xmas-tree { right: 3%; }
+@media (max-width: 640px) {
+  .xmas-tree { height: 46%; right: 2%; opacity: .75; }
+  .xmas-tree.small { display: none; }
+}
 
 /* ---------- Personen-Übersicht ---------- */
 
@@ -423,7 +470,7 @@ textarea { resize: vertical; min-height: 80px; }
 .item .price {
   position: relative; display: inline-flex; align-items: center;
   padding: 4px 16px 4px 26px; border-radius: 10px 999px 999px 10px;
-  background: var(--accent-soft); color: var(--accent-hover);
+  background: var(--price-bg, var(--accent-soft)); color: var(--price-fg, var(--accent-hover));
   font-family: var(--font-display); font-weight: 650; font-size: 1.3rem;
   transform: rotate(-2deg);
 }
