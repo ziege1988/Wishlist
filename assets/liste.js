@@ -6,7 +6,14 @@ import {
 } from "./common.js";
 
 const app = document.getElementById("app");
-const token = new URLSearchParams(location.search).get("t") || "";
+const params = new URLSearchParams(location.search);
+const token = params.get("t") || "";
+
+// Vorschau für den Admin: nur Anzeige, "Besorge ich" wird nur simuliert (nichts wird gespeichert)
+const PREVIEW = params.get("vorschau") === "1";
+const PREVIEW_PERSON = /^[0-9a-f-]{36}$/i.test(params.get("p") || "") ? params.get("p") : "";
+const PREVIEW_HIDE_CLAIMS = params.get("s") === "1"; // Überraschungsmodus: echte Reservierungen verbergen
+const simulated = {}; // itemId -> Name (nur im Speicher dieser Seite)
 const REFRESH_MS = 20000;
 
 const STORE_CLAIMS = "wishlist.myClaims";   // itemId -> Geheimnis zum Aufheben
@@ -14,6 +21,7 @@ const STORE_NAME = "wishlist.myName";
 const STORE_HIDE = "wishlist.hideClaimed";
 
 let list = null;
+let rawList = null;
 let hideClaimed = readStore(STORE_HIDE, false);
 let claimingItem = null;
 let refreshTimer = null;
@@ -33,7 +41,21 @@ function writeStore(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
   } catch { /* ignorieren */ }
 }
-const myClaims = () => readStore(STORE_CLAIMS, {});
+const myClaims = () => (PREVIEW
+  ? Object.fromEntries(Object.keys(simulated).map((id) => [id, true]))
+  : readStore(STORE_CLAIMS, {}));
+
+/** Vorschau: echte Reservierungen ggf. ausblenden, simulierte darüberlegen */
+function applyPreview(data) {
+  return {
+    ...data,
+    items: data.items.map((i) => {
+      const item = PREVIEW_HIDE_CLAIMS ? { ...i, claimed: false, claimer_name: null } : { ...i };
+      if (simulated[i.id] && !item.claimed) Object.assign(item, { claimed: true, claimer_name: simulated[i.id] });
+      return item;
+    }),
+  };
+}
 
 function renderMissing() {
   document.title = "Wunschliste nicht gefunden";
@@ -53,8 +75,9 @@ async function load({ quiet = false } = {}) {
     return;
   }
   if (!data) return renderMissing();
-  list = data;
-  cleanupMyClaims();
+  rawList = data;
+  list = PREVIEW ? applyPreview(data) : data;
+  if (!PREVIEW) cleanupMyClaims();
   render();
   if (!pricesChecked) checkPrices();
 }
@@ -84,6 +107,18 @@ function cleanupMyClaims() {
   if (changed) writeStore(STORE_CLAIMS, mine);
 }
 
+function previewBar() {
+  if (!PREVIEW) return "";
+  const back = PREVIEW_PERSON ? `index.html#/p/${PREVIEW_PERSON}` : "index.html";
+  return `
+    <div class="preview-bar" role="note">
+      <span class="preview-text"><span class="emo">👀</span>
+        <span><strong>Vorschau</strong> – so sehen Schenkende deine Liste. „Besorge ich“ wird hier nur simuliert.
+        ${PREVIEW_HIDE_CLAIMS ? "<br><small>🤫 Überraschungsmodus: Echte Reservierungen werden nicht angezeigt.</small>" : ""}</span></span>
+      <a class="btn sm" href="${back}" data-preview-close><span class="emo">✕</span> Schließen</a>
+    </div>`;
+}
+
 function render() {
   const mine = myClaims();
   const items = list.items;
@@ -101,6 +136,7 @@ function render() {
   document.body.dataset.palette = paletteOf(list);
 
   app.innerHTML = `
+    ${previewBar()}
     <section class="hero center">
       ${decoHtml(occ, paletteOf(list))}
       <div class="hero-emoji">${OCCASIONS[occ].emoji}</div>
@@ -224,7 +260,11 @@ function openClaim(item) {
   claimingItem = item;
   document.getElementById("claim-item-title").textContent =
     item.title + (item.price !== null ? ` · ${formatPrice(item.price)}` : "");
-  claimForm.elements.claimer.value = readStore(STORE_NAME, "");
+  claimForm.elements.claimer.value = PREVIEW ? "Vorschau" : readStore(STORE_NAME, "");
+  document.getElementById("claim-preview-hint").hidden = !PREVIEW;
+  claimSubmit.innerHTML = PREVIEW
+    ? `<span class="emo">🧪</span> Simulieren`
+    : `<span class="emo">🎉</span> Ja, besorge ich`;
   claimDialog.showModal();
   claimForm.elements.claimer.focus();
 }
@@ -233,6 +273,16 @@ async function submitClaim(e) {
   e.preventDefault();
   const name = claimForm.elements.claimer.value.trim();
   if (!name) return toast("Bitte gib deinen Namen ein.", "error");
+
+  if (PREVIEW) {
+    // Nur simulieren – keine Anfrage an den Server
+    simulated[claimingItem.id] = name;
+    claimDialog.close();
+    list = applyPreview(rawList);
+    render();
+    celebrate({ recipient: list.name, title: claimingItem.title, occasion: occasionOf(list), palette: paletteOf(list), preview: true });
+    return;
+  }
 
   claimSubmit.disabled = true;
   const { data: secret, error } = await sb.rpc("claim_item", {
@@ -263,6 +313,13 @@ async function submitClaim(e) {
 }
 
 async function unclaim(item, button) {
+  if (PREVIEW) {
+    delete simulated[item.id];
+    list = applyPreview(rawList);
+    render();
+    toast("Vorschau: Reservierung aufgehoben (nur simuliert).");
+    return;
+  }
   const secret = myClaims()[item.id];
   if (!secret) return;
   if (!confirm(`Reservierung für „${item.title}“ aufheben?\nDer Wunsch ist dann wieder für alle verfügbar.`)) return;

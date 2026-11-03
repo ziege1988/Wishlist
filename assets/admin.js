@@ -267,6 +267,13 @@ async function backgroundPriceRefresh(person) {
   } catch { /* Funktion noch nicht eingerichtet – kein Problem */ }
 }
 
+/** Vorschau-Link: gleiche Seite wie für Schenkende, aber nur Anzeige + Simulation */
+function listPreviewUrl(person) {
+  const u = new URL(`liste.html?t=${person.share_token}&vorschau=1&p=${person.id}`, location.href);
+  if (person.surprise_mode) u.searchParams.set("s", "1");
+  return u.href;
+}
+
 function shareUrl(person) {
   return new URL(`liste.html?t=${person.share_token}`, location.href).href;
 }
@@ -318,7 +325,7 @@ function renderPerson() {
           <div class="share-buttons">
             <a class="btn sm" href="https://wa.me/?text=${encodeURIComponent(waText)}" target="_blank" rel="noopener"><span class="emo">💬</span> WhatsApp</a>
             ${navigator.share ? `<button class="btn sm" data-action="native-share"><span class="emo">📤</span> Teilen</button>` : ""}
-            <a class="btn sm" href="${esc(link)}" target="_blank" rel="noopener"><span class="emo">👀</span> Vorschau</a>
+            <a class="btn sm" href="${esc(listPreviewUrl(person))}"><span class="emo">👀</span> Vorschau</a>
           </div>
           <button class="btn sm ghost" data-action="regen-link" title="Der alte Link funktioniert danach nicht mehr"><span class="emo">🔁</span> Neuen Link erzeugen</button>
         </section>

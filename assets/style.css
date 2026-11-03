@@ -634,3 +634,17 @@ dialog h2 .emo { display: grid; place-items: center; width: 46px; height: 46px; 
 /* Admin-Kopfbereich: Deko nicht hinter den Buttons oben rechts */
 .hero:not(.center) .deco span:nth-child(2) { left: 72% !important; top: 62% !important; }
 .hero:not(.center) .deco span:nth-child(5) { left: 46% !important; top: 12% !important; }
+
+/* ---------- Vorschau (nur Anzeige, Simulation) ---------- */
+.preview-bar {
+  position: sticky; top: max(8px, env(safe-area-inset-top)); z-index: 40;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin: 8px 0 16px; padding: 10px 10px 10px 16px;
+  background: var(--text); color: var(--bg);
+  border-radius: 22px; box-shadow: 0 4px 0 rgba(0,0,0,.12), 0 14px 30px -12px rgba(0,0,0,.45);
+}
+.preview-text { display: flex; align-items: center; gap: 10px; font-size: .92rem; line-height: 1.35; }
+.preview-text .emo { font-size: 1.5rem; }
+.preview-text small { opacity: .85; }
+.preview-bar .btn { flex: none; }
+.preview-hint { margin: 0; padding: 10px 14px; border-radius: 14px; background: var(--accent-soft); font-size: .92rem; }

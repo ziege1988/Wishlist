@@ -350,7 +350,7 @@ const CELEBRATE_LINES = {
 };
 
 /** Feier-Karte + Konfettikanone nach erfolgreichem "Besorge ich" */
-export function celebrate({ recipient, title, occasion = "other", palette = "pink" }) {
+export function celebrate({ recipient, title, occasion = "other", palette = "pink", preview = false }) {
   document.querySelector(".celebrate")?.remove();
   const lines = CELEBRATE_LINES[occasion] || CELEBRATE_LINES.other;
   const extra = lines[(Math.random() * lines.length) | 0];
@@ -371,7 +371,9 @@ export function celebrate({ recipient, title, occasion = "other", palette = "pin
       <p class="celebrate-text">${esc(recipient)} wird sich riesig über <strong>„${esc(title)}“</strong> freuen.</p>
       <p class="celebrate-extra">${esc(extra)}</p>
       <button type="button" class="btn primary big block" data-close-celebrate><span class="emo">🥳</span> Juhu!</button>
-      <p class="celebrate-note">Der Wunsch ist jetzt für dich reserviert – niemand sonst kann ihn mehr auswählen.</p>
+      <p class="celebrate-note">${preview
+        ? "🧪 Nur Vorschau – es wurde nichts reserviert."
+        : "Der Wunsch ist jetzt für dich reserviert – niemand sonst kann ihn mehr auswählen."}</p>
     </div>`;
   document.body.appendChild(overlay);
 
