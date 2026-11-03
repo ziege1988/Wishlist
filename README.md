@@ -115,6 +115,10 @@ Das Skript ergänzt nur, was fehlt. Vorhandene Listen, Wünsche und Reservierung
 
 Der Admin-Bereich öffnet sich danach wie eine eigene App. Schenkende können ihre Liste genauso ablegen und haben sie dann direkt auf dem Handy.
 
+## Updates und Zwischenspeicher
+CSS- und JavaScript-Dateien werden mit einer Versionsnummer eingebunden (`?v=…`). Nach Code-Änderungen vor dem Commit
+`tools/version.sh` ausführen. So laden Browser und Homescreen-Apps garantiert die neue Version statt einer zwischengespeicherten.
+
 ## Lokal testen
 
 Ein beliebiger statischer Webserver genügt, zum Beispiel:

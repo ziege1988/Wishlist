@@ -3,7 +3,7 @@ import {
   sb, isConfigured, esc, formatPrice, parsePrice, priceStamp, safeUrl, hostOf, imageUrl,
   toast, placeholder, renderNotConfigured, compressImage, dataUrlToBlob, callPriceFunction,
   OCCASIONS, occasionOf, countdownText, ageText, eventDateText, decoHtml, paletteOf, themeAttrs, BUCKET,
-} from "./common.js";
+} from "./common.js?v=202611032316";
 
 const app = document.getElementById("app");
 const userbox = document.getElementById("userbox");

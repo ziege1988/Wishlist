@@ -3,7 +3,7 @@ import {
   sb, isConfigured, esc, formatPrice, priceStamp, safeUrl, hostOf, imageUrl,
   toast, placeholder, renderNotConfigured, callPriceFunction,
   OCCASIONS, occasionOf, countdownText, ageText, eventDateText, decoHtml, celebrate, paletteOf,
-} from "./common.js";
+} from "./common.js?v=202611032316";
 
 const app = document.getElementById("app");
 const params = new URLSearchParams(location.search);
@@ -26,6 +26,7 @@ let hideClaimed = readStore(STORE_HIDE, false);
 let claimingItem = null;
 let refreshTimer = null;
 let pricesChecked = false;
+let isAdmin = false; // Admin öffnet den echten Teilen-Link -> Weg zurück anbieten
 
 // localStorage kann (z. B. im privaten Modus) fehlen – dann eben ohne Merken
 function readStore(key, fallback) {
@@ -108,6 +109,14 @@ function cleanupMyClaims() {
 }
 
 function previewBar() {
+  if (!PREVIEW && isAdmin) {
+    return `
+    <div class="preview-bar admin" role="note">
+      <span class="preview-text"><span class="emo">🔧</span>
+        <span>Du bist als Admin angemeldet. Das ist die <strong>echte Liste</strong> – „Besorge ich“ reserviert hier wirklich.</span></span>
+      <a class="btn sm" href="index.html" data-preview-close><span class="emo">←</span> Zur Verwaltung</a>
+    </div>`;
+  }
   if (!PREVIEW) return "";
   const back = PREVIEW_PERSON ? `index.html#/p/${PREVIEW_PERSON}` : "index.html";
   return `
@@ -353,4 +362,12 @@ if (!isConfigured) {
 } else {
   setup();
   load();
+  if (!PREVIEW) {
+    sb.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        isAdmin = true;
+        if (list) render();
+      }
+    }).catch(() => {});
+  }
 }
